@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.py
+awesome_cli/__init__.py
+awesome_cli/core.py
+awesome_cli/main.py
+awesome_cli.egg-info/PKG-INFO
+awesome_cli.egg-info/SOURCES.txt
+awesome_cli.egg-info/dependency_links.txt
+awesome_cli.egg-info/entry_points.txt
+awesome_cli.egg-info/requires.txt
+awesome_cli.egg-info/top_level.txt

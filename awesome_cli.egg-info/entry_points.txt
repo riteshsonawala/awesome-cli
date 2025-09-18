@@ -1,0 +1,2 @@
+[console_scripts]
+awesome-cli-example = awesome_cli.main:main

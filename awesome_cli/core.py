@@ -1,13 +1,9 @@
-#!/usr/bin/env python3
-"""
-Extensible CLI Framework
-Allows easy addition of self-contained commands following a standard structure.
-"""
+"""Core CLI framework components."""
 
 import argparse
 import importlib
+import importlib.util
 import inspect
-import os
 import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -47,14 +43,20 @@ class Command(ABC):
 class CLI:
     """Main CLI application that manages and executes commands."""
 
-    def __init__(self, name: str = "awesome-cli", description: str = "Extensible CLI Framework"):
+    def __init__(self, name: str = "cli", description: str = "CLI Application", version: str = "0.1.0"):
         self.name = name
         self.description = description
+        self.version = version
         self.commands: Dict[str, Command] = {}
         self.parser = argparse.ArgumentParser(
             prog=name,
             description=description,
             formatter_class=argparse.RawDescriptionHelpFormatter
+        )
+        self.parser.add_argument(
+            '--version', '-v',
+            action='version',
+            version=f'{name} {version}'
         )
         self.subparsers = self.parser.add_subparsers(
             dest='command',
@@ -97,8 +99,10 @@ class CLI:
         if not commands_dir.exists():
             return
 
-        # Add commands directory to Python path
-        sys.path.insert(0, str(commands_dir.parent))
+        # Add commands directory to Python path if needed
+        parent_dir = str(commands_dir.parent)
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
 
         for file_path in commands_dir.glob("*.py"):
             if file_path.name.startswith("_"):
@@ -107,20 +111,45 @@ class CLI:
             module_name = f"{directory.replace('/', '.')}.{file_path.stem}"
 
             try:
-                module = importlib.import_module(module_name)
+                # Try to import module
+                spec = importlib.util.spec_from_file_location(module_name, file_path)
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[module_name] = module
+                    spec.loader.exec_module(module)
 
-                # Find all Command subclasses in the module
-                for name, obj in inspect.getmembers(module):
-                    if (inspect.isclass(obj) and
-                        issubclass(obj, Command) and
-                        obj != Command and
-                        not inspect.isabstract(obj)):
+                    # Find all Command subclasses in the module
+                    for name, obj in inspect.getmembers(module):
+                        if (inspect.isclass(obj) and
+                            issubclass(obj, Command) and
+                            obj != Command and
+                            not inspect.isabstract(obj)):
 
-                        self.register_command_class(obj)
-                        print(f"Registered command: {obj().name}")
+                            self.register_command_class(obj)
 
             except Exception as e:
                 print(f"Failed to load module {module_name}: {e}", file=sys.stderr)
+
+    def discover_commands_from_module(self, module_name: str) -> None:
+        """Discover commands from an installed Python module.
+
+        Args:
+            module_name: Name of the module containing commands
+        """
+        try:
+            module = importlib.import_module(module_name)
+
+            # Find all Command subclasses in the module
+            for name, obj in inspect.getmembers(module):
+                if (inspect.isclass(obj) and
+                    issubclass(obj, Command) and
+                    obj != Command and
+                    not inspect.isabstract(obj)):
+
+                    self.register_command_class(obj)
+
+        except ImportError as e:
+            print(f"Failed to import module {module_name}: {e}", file=sys.stderr)
 
     def run(self, argv: Optional[List[str]] = None) -> int:
         """Run the CLI with given arguments.
@@ -156,18 +185,3 @@ class CLI:
         except Exception as e:
             print(f"Error executing command '{args.command}': {e}", file=sys.stderr)
             return 1
-
-
-def main():
-    """Main entry point for the CLI."""
-    cli = CLI()
-
-    # Discover commands from the commands directory
-    cli.discover_commands("commands")
-
-    # Run the CLI
-    sys.exit(cli.run())
-
-
-if __name__ == "__main__":
-    main()

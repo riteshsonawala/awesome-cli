@@ -1,3 +1,41 @@
+Metadata-Version: 2.4
+Name: awesome-cli
+Version: 0.1.0
+Summary: An extensible CLI framework for building modular command-line applications
+Home-page: https://github.com/yourusername/awesome-cli
+Author: Your Name
+Author-email: Your Name <your.email@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/awesome-cli
+Project-URL: Repository, https://github.com/yourusername/awesome-cli
+Project-URL: Bug Tracker, https://github.com/yourusername/awesome-cli/issues
+Keywords: cli,command-line,framework,extensible,modular
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: black>=22.0; extra == "dev"
+Requires-Dist: flake8>=4.0; extra == "dev"
+Requires-Dist: mypy>=0.950; extra == "dev"
+Requires-Dist: build>=0.7; extra == "dev"
+Requires-Dist: twine>=4.0; extra == "dev"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
 # awesome-cli - Extensible CLI Framework
 
 A Python library for building modular, extensible command-line applications with automatic command discovery.
