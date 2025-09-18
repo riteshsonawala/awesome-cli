@@ -1,0 +1,1 @@
+print("getting started with awesome cli")
